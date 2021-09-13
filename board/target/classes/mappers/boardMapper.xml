@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.spring.board.boardMapper">
+	<select id = "getBoardList" parameterType="com.spring.board.form.BoardForm" resultType="com.spring.board.dto.BoardDto">
+		select *
+		from (select board_no
+			,board_writer
+			,board_title
+			,board_content
+			,board_hits
+			,date_format( create_date, '%Y-%m-%d' ) as create_date
+            ,date_format( update_date, '%Y-%m-%d' ) as update_date
+			from monkey.board) T1
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<update id="updateBoardHits" parameterType="com.spring.board.form.BoardForm">
+        update monkey.board
+           set board_hits = board_hits + 1             
+             , update_date = now()
+         where board_no = #{board_no}
+    </update>
+    
+   <select id="getBoardDetail" parameterType="com.spring.board.form.BoardForm" resultType="com.spring.board.dto.BoardDto">
+    
+        select board_no 
+             , board_writer
+             , board_title 
+             , board_content 
+             , board_hits
+             , date_format(create_date, '%Y-%m-%d %H:%i:%s' ) as create_date
+             , date_format(update_date, '%Y-%m-%d %H:%i:%s' ) as update_date  
+        from monkey.board
+        where board_no = #{board_no} 
+    
+    </select> 
+    
+    <insert id="insertBoard" parameterType="com.spring.board.form.BoardForm">
+        insert 
+          into monkey.board
+             (
+                  board_writer
+                  ,board_title
+                  ,board_content
+                  ,create_date
+                  ,update_date
+              ) 
+        values 
+             (
+                #{board_writer}
+                ,#{board_title}
+                ,#{board_content}
+                ,now() 
+                ,now() 
+              )
+    </insert>
+    
+    <delete id="deleteBoard" parameterType="com.spring.board.form.BoardForm">
+        delete 
+          from monkey.board
+         where board_no = #{board_no}
+    </delete>
+    
+    <update id="updateBoard" parameterType="com.spring.board.form.BoardForm">
+    
+        update monkey.board 
+           set board_title = #{board_title}
+             , board_content = #{board_content}
+             , update_date = now()
+         where board_no = #{board_no}
+    
+    </update>
+    <select id="getBoardCount" parameterType="com.spring.board.form.BoardForm" resultType="int">
+    	select count(*)
+    	from monkey.board
+    </select>
+</mapper>
